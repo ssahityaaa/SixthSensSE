@@ -4,11 +4,12 @@ from flask import Flask, request, jsonify, render_template
 import tensorflow as tf
 import os
 
-class_names = ["ADITI", "KRATIKA", "Radhika", "SHREYA", "Sahitya"]
+
+app = Flask(__name__, static_url_path='/static')
+
+class_names = ["Aditi", "Kratika", "Radhika", "Shreya", "Sahitya"]
 model_path = "handwriting_recognition_model2.h5"
 loaded_model = tf.keras.models.load_model(model_path)
-
-app = Flask(__name__)
 
 def preprocess_image(image):
     img = Image.open(image)
