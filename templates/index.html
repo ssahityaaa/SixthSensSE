@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwriting Recognition</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0077ff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #imageInput {
+            margin-top: 20px;
+        }
+
+        #uploadButton {
+            margin-top: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #uploadButton:hover {
+            background-color: #0056b3;
+        }
+
+        #response {
+            background-color: rgb(254, 254, 254);
+            color: rgb(0, 0, 0);
+            padding: 0px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+
+        #response p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Handwriting Identification</h1>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="file" id="imageInput" accept="image/*">
+            <button type="submit" id="uploadButton">Upload</button>
+        </form>
+        <div id="response" class="output-box"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const responseDiv = document.getElementById('response');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.error) {
+                    responseDiv.innerHTML = '<p>Error: ' + data.error + '</p>';
+                } else {
+                    responseDiv.innerHTML = '<p>Predicted Class: ' + data.predicted_class + '</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                responseDiv.innerHTML = '<p>Error occurred. Please try again.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

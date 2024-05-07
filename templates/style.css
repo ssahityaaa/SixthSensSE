@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwriting Recognition</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #fileInput {
+            margin-top: 20px;
+        }
+
+        #uploadButton {
+            margin-top: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #uploadButton:hover {
+            background-color: #0056b3;
+        }
+
+        .output-box {
+            background-color: black;
+            color: white;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .output-text {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Handwriting Recognition</h1>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="file" id="fileInput" accept=".jpg, .jpeg, .png">
+            <button type="button" id="uploadButton" onclick="uploadImage()">Upload Image</button>
+        </form>
+        <div id="predictionResult" class="output-box"></div>
+    </div>
+
+    <script>
+        function uploadImage() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select an image file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('http://localhost:5000/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayPrediction(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function displayPrediction(data) {
+            const predictionResult = document.getElementById('predictionResult');
+            predictionResult.innerHTML = '';
+
+            if ('predicted_class' in data) {
+                const predictionText = document.createElement('p');
+                predictionText.textContent = `Predicted class: ${data.predicted_class}`;
+                predictionText.classList.add('output-text');
+                predictionResult.appendChild(predictionText);
+            } else if ('error' in data) {
+                const errorText = document.createElement('p');
+                errorText.textContent = `Error: ${data.error}`;
+                errorText.classList.add('output-text');
+                predictionResult.appendChild(errorText);
+            } else {
+                const unknownErrorText = document.createElement('p');
+                unknownErrorText.textContent = 'Unknown error occurred.';
+                unknownErrorText.classList.add('output-text');
+                predictionResult.appendChild(unknownErrorText);
+            }
+        }
+    </script>
+</body>
+</html>
